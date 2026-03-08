@@ -2,354 +2,180 @@
 
 ## 1. Main Idea and Objective
 
-ProcessOS is an interactive operating system simulator designed to visualize process scheduling and memory management behavior in real time.
+ProcessOS is designed as a simulation-first learning platform where core operating system algorithms are executed deterministically and presented through responsive, interactive visual layers.
 
-Core objective:
+Architecture objectives:
+- Separation of concerns across UI, state, and engine modules
+- Predictable algorithm execution with testable outputs
+- Strong type contracts for maintainability and scale
 
-- Bridge the gap between OS theory and practical understanding through live visual simulation.
-
-## 2. High-Level System Architecture
+## 2. High-Level Architecture
 
 ```mermaid
 flowchart TB
-  SE[Simulation Engine\nScheduling + Memory]
-  RV[React Visualization Layer\nInteractive Simulation]
-  ASP[React System Panel\nMonitoring Dashboard]
-  SS[Shared State Layer\nTypeScript]
-  AM[Algorithm Modules]
+  UI[Presentation Layer\nReact Pages and Components]
+  ST[State Orchestration Layer\nContext and Hooks]
+  EN[Computation Layer\nScheduling, Memory, Paging, Deadlock Engines]
+  SH[Shared Contracts\nTypeScript Models]
 
-  SE --> RV
-  SE --> ASP
-  RV --> SS
-  ASP --> SS
-  SS --> AM
+  UI --> ST
+  ST --> EN
+  EN --> ST
+  SH --> UI
+  SH --> ST
+  SH --> EN
 ```
 
-Architecture intent:
+## 3. Architecture Design Principles
 
-- React: simulation and animated visualization.
-- React dashboard: monitoring and analytics.
-- Shared state (TypeScript): common models and synchronized execution state.
+- Deterministic computation: engines avoid UI coupling and side effects.
+- Contract-first communication: model shapes are shared and typed.
+- Composable UI: reusable components for rapid feature growth.
+- Observability: algorithm outputs are converted into measurable visuals.
 
-## 3. Layer-Wise Responsibilities
+## 4. Core Layer Responsibilities
 
-### Simulation Engine Layer
+### Presentation Layer
+- Route handling and module navigation
+- Forms and simulation controls
+- Visual representations: Gantt, charts, status panels
 
-- Executes scheduling and memory operations.
-- Emits state transitions and metrics.
+### State Orchestration Layer
+- Holds canonical simulation inputs and outputs
+- Mediates between user actions and engine execution
+- Exposes ready-to-render state slices to components
 
-### React Visualization Layer
+### Computation Layer
+- Executes algorithm implementations
+- Produces metrics and timeline artifacts
+- Encodes scheduling, allocation, replacement, and deadlock logic
 
-- Renders process timelines and memory visuals.
-- Handles process creation and playback controls.
+### Shared Contract Layer
+- Defines process, memory, and metrics models
+- Prevents structural drift between modules
 
-### System Monitoring Panel
-
-- Displays live system health (CPU, memory, faults, deadlock alerts).
-- Provides algorithm comparison views.
-
-### Shared State Layer
-
-- Keeps process/memory metrics consistent across UI layers.
-- Defines unified interfaces and event payloads.
-
-### Algorithm Modules Layer
-
-- Encapsulates scheduling, memory, paging, and deadlock logic.
-
-## 4. Core Module Architecture
+## 5. Module Architecture Map
 
 ```mermaid
 flowchart LR
-  PM[Process Manager] --> SCH[CPU Scheduling Engine]
-  SCH --> GANTT[Gantt Chart Visualizer]
-  PM --> MEM[Memory Allocation Simulator]
-  PM --> PAG[Page Replacement Engine]
-  PM --> DL[Deadlock Detection System]
-  SCH --> MON[System Monitor Dashboard]
+  INPUT[Process and Resource Inputs]
+  SCH[Scheduler Module]
+  MEM[Memory Allocation Module]
+  PAG[Page Replacement Module]
+  DLD[Deadlock Detection Module]
+  MON[Monitoring and Metrics Module]
+
+  INPUT --> SCH
+  INPUT --> MEM
+  INPUT --> PAG
+  INPUT --> DLD
+  SCH --> MON
   MEM --> MON
   PAG --> MON
-  DL --> MON
+  DLD --> MON
 ```
 
-## Module Responsibility Distribution
-
-```mermaid
-pie title Layer Responsibility Distribution
-  "Simulation Engine" : 30
-  "React Visualization" : 25
-  "Monitoring Dashboard" : 20
-  "Shared Contracts" : 10
-  "Backend + DB Services" : 15
-```
-
-## 5. Process Manager Design
-
-Responsibilities:
-
-- Create, edit, and delete processes.
-- Track lifecycle state transitions.
-
-Attributes:
-
-- PID
-- Arrival Time
-- Burst Time
-- Priority
-- Memory Requirement
-- State
-
-State machine:
-
-```mermaid
-stateDiagram-v2
-  [*] --> NEW
-  NEW --> READY
-  READY --> RUNNING
-  RUNNING --> WAITING
-  WAITING --> READY
-  RUNNING --> TERMINATED
-```
-
-Data structures:
-
-- Queue
-- Priority Queue
-
-## 6. CPU Scheduling Engine Design
-
-Supported algorithms:
-
-- FCFS
-- SJF
-- Round Robin
-- Priority Scheduling
-
-Data structures:
-
-- Queue
-- Min Heap (SJF)
-- Circular Queue (RR)
-- Priority Queue
-
-Execution flow:
+## 6. Workflow and Control Flow
 
 ```mermaid
 flowchart TD
-  A[Input process list] --> B[Sort/select based on algorithm]
-  B --> C[Dispatch to CPU]
-  C --> D[Reduce burst / update remaining time]
-  D --> E{Process complete?}
-  E -->|No| B
-  E -->|Yes| F[Mark terminated + collect metrics]
+  A[User Configures Workload] --> B[Context Validates Input]
+  B --> C[Engine Selection]
+  C --> D[Algorithm Execution]
+  D --> E[Metrics Generation]
+  E --> F[State Update]
+  F --> G[Visualization Refresh]
 ```
 
-## 7. Gantt Chart Visualizer (React)
-
-Design goals:
-
-- Live execution timeline
-- Color-coded process segments
-- Time quantum animation
-- Step-by-step playback
-
-Implementation style:
-
-- Canvas API or SVG-based timeline rendering
-- `500ms` frame updates
-
-## 8. Memory Allocation Simulator
-
-Algorithms:
-
-- First Fit
-- Best Fit
-- Worst Fit
-
-Tracks:
-
-- Fragmentation
-- Allocation failure
-- Overall memory usage
-
-## 9. Page Replacement Engine
-
-Algorithms:
-
-- FIFO
-- LRU
-- Optimal
-
-Metrics:
-
-- Total references
-- Page faults
-- Hit ratio
-- Fault ratio
-
-## 10. Deadlock Detection System
-
-Techniques:
-
-- Banker's algorithm
-- Resource allocation graph cycle detection
-- DFS traversal
-
-Graph model:
-
-```mermaid
-flowchart LR
-  P1[Process] --> R1[Resource]
-  R1 --> P2[Process]
-  P2 --> R2[Resource]
-  R2 --> P1
-```
-
-If cycle exists, system flags deadlock and suggests:
-
-- Process termination
-- Resource preemption
-
-## 11. Monitoring Dashboard (React)
-
-Views:
-
-- Process table (`PID`, `State`, `CPU%`, `Memory`)
-- CPU utilization graph (time-series)
-- Algorithm comparison report
-
-Comparison outputs:
-
-- Average waiting time
-- Average turnaround time
-- CPU utilization
-- Throughput
-
-## 12. Data Flow and Integration
+## 7. Execution Sequence (Detailed)
 
 ```mermaid
 sequenceDiagram
-  participant U as User
-  participant R as React Simulator
-  participant S as Shared State
-  participant E as Algorithm Engine
-  participant A as React Dashboard
+  participant User
+  participant UI as React Module Page
+  participant Ctx as Simulation Context
+  participant Eng as Engine Function
+  participant Viz as Gantt and Chart Components
 
-  U->>R: Create process / select algorithm
-  R->>S: Update process state
-  S->>E: Trigger algorithm execution
-  E-->>S: Return metrics + transitions
-  S-->>R: Render timeline + memory view
-  S-->>A: Render monitoring dashboard
+  User->>UI: Submit process set and options
+  UI->>Ctx: Dispatch run request
+  Ctx->>Eng: Execute selected algorithm
+  Eng-->>Ctx: Return timeline and metrics
+  Ctx-->>Viz: Push updated state
+  Viz-->>User: Render outputs and comparisons
 ```
 
-## 13. Deployment Topology (Target)
+## 8. Data Flow Diagram
 
 ```mermaid
 flowchart LR
-  UI1[React App\nSimulation UI] --> API[Backend API Gateway]
-  UI2[React Dashboard\nMonitoring Views] --> API
-  API --> CORE[Core Simulation Services]
-  CORE --> DB[(PostgreSQL / MongoDB)]
-  API --> WS[WebSocket Stream]
-  WS --> UI1
-  WS --> UI2
+  P[Input Payload] --> V[Validation]
+  V --> E[Engine Compute]
+  E --> R[Result Model]
+  R --> C[Context Store]
+  C --> U[UI Views]
 ```
 
-Current repo status:
+## 9. Module Responsibilities
 
-- Frontend applications and simulation engines are implemented.
-- Backend/API/DB layer is implemented in `backend/` (Express + SQLite).
+| Module | Responsibility | Output |
+|---|---|---|
+| `src/engine/scheduler.ts` | CPU scheduling computations | Timeline, waiting/turnaround metrics |
+| `src/engine/memory.ts` | Memory placement strategies | Allocation map, fragmentation insights |
+| `src/engine/paging.ts` | Page replacement simulation | Hit/fault counts and ratios |
+| `src/engine/deadlock.ts` | Safety and cycle analysis | Deadlock status and diagnostics |
+| `src/context/SimulationContext.tsx` | State coordination | Shared simulation state |
+| `src/components/*` | Visual rendering | Interactive charts, forms, tables |
 
-## 14. Shared Contract Design
+## 10. Integration Details
 
-Shared TypeScript contracts live under `shared/types/` to keep UI and backend models aligned.
+- Routing integration: module pages mounted via `src/App.tsx`.
+- State integration: pages consume context-driven simulation state.
+- Engine integration: pure TypeScript functions called from context/hooks.
+- Visualization integration: engine results mapped to reusable chart components.
 
-Contract priorities:
+## 11. Tech Stack and Rationale
 
-- Single source of truth for process snapshots and metrics.
-- Stable payload shape across UI and service boundaries.
-- Backward-compatible schema evolution.
+| Technology | Role | Rationale |
+|---|---|---|
+| React | UI composition | Mature component model for dynamic views |
+| TypeScript | Type safety | Prevents model mismatch and runtime surprises |
+| Vite | Build and dev runtime | Fast startup and optimized production output |
+| Tailwind + Radix | UI system | Consistent responsive primitives and speed |
+| Chart.js + D3 | Data visualization | Practical rendering with transform flexibility |
+| Vitest | Testing | Fast, modern testing workflow for TS projects |
 
-## 15. Implemented Backend and Database Design
+## 12. Advantages, Benefits, and Trade-Offs
 
-Backend stack:
+Advantages:
+- Strong conceptual clarity for OS algorithms
+- Clean modular boundaries
+- Reliable developer workflow with lint/test/build checks
 
-- Express (REST API)
-- TypeScript
-- SQLite for persistence
-- Zod validation for request safety
+Benefits:
+- Easy onboarding for students and interview demos
+- Fast iteration on new algorithm modules
+- Good foundation for future API-backed persistence
 
-Database tables:
+Trade-offs:
+- Client-side scope limits persistence and collaboration
+- Rich visualization layer increases component complexity
 
-- `scenarios`
-  - `id`, `name`, `payload`, `created_at`
-- `simulation_runs`
-  - `id`, `scenario_id`, `algorithm`, `time_quantum`, `input_payload`, `result_payload`, `created_at`
+## 13. Scalability Path
 
-Persistence behavior:
+```mermaid
+flowchart LR
+  F1[Current: Frontend Simulator] --> F2[Add Backend API]
+  F2 --> F3[Add Persistence Layer]
+  F3 --> F4[Add Real-time Collaboration]
+  F4 --> F5[Cloud Deployment and Monitoring]
+```
 
-- Scenario definitions are stored and retrievable.
-- Simulation executions are computed server-side and persisted with full result payload.
+## 14. Current Scope and Future Expansion
 
-## 16. Reliability, Failure Handling, and Performance
+Current scope:
+- Fully functional frontend simulator with tested algorithm engines
 
-Reliability architecture:
-
-- Validation before process insertion and updates.
-- Allocation-failure handling with explicit error messages.
-- Deterministic pure functions for algorithm engines.
-
-Failure handling strategy:
-
-- UI-level graceful empty states and disabled actions.
-- Non-crashing fallbacks for missing results.
-- Route-level 404 fallback.
-- API validation failures return explicit `400` error payloads.
-- Invalid IDs and not-found resources return controlled error responses.
-
-Performance charting strategy:
-
-- Chart.js for dashboard rendering efficiency.
-- D3 utilities for scale normalization and data transforms.
-- Canvas API for lightweight timeline rendering.
-
-Performance strategy:
-
-- Canvas rendering for static Gantt timeline.
-- Chart.js with lightweight D3 scaling utilities.
-- Route modularization to support future code-splitting.
-
-## 17. Technology Stack and Rationale
-
-- React: strong interactive visualization capabilities.
-- React dashboard modules: structured monitoring panels.
-- TypeScript: strict type safety across modules.
-- Canvas/SVG + Chart libraries: clear real-time visuals.
-- Node/Express + SQLite: implemented persistence and API integration.
-
-## 18. Pros and Cons
-
-Pros:
-
-- Excellent educational value with practical visualization.
-- Strong algorithm and data-structure coverage.
-- Clear system design with separable module boundaries.
-
-Cons:
-
-- Broader module surface requires strict state contracts.
-- Additional coordination effort for build and deployment pipelines.
-
-## 19. Scalability and Extensibility
-
-Planned growth paths:
-
-- Multi-core CPU simulation.
-- Cloud deployment.
-- Exportable reports (PDF/CSV).
-- Collaborative simulation sessions.
-
-## 20. Architecture Summary
-
-ProcessOS uses a simulation-first architecture with a shared state contract, where React drives both execution visualization and monitoring intelligence while backend services handle persistence and API orchestration. This structure maximizes conceptual clarity and technical depth for academic and interview-ready demonstrations.
+Future expansion:
+- Backend API and database storage for scenario history
+- Multi-user collaboration and shareable simulation sessions

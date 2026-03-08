@@ -1,425 +1,247 @@
 # ProcessOS - Project Documentation
 
-## 1. Project Objective
+## 1. Main Idea and Objective
 
-Build an interactive operating system simulator where users can create processes, execute scheduling/memory algorithms, and monitor system behavior visually in real time.
+ProcessOS is an educational and engineering-focused simulator for core operating system concepts.
 
-The platform is intended for:
+Primary objectives:
+- Convert abstract OS algorithms into interactive visual experiences
+- Deliver reliable algorithm outputs with deterministic behavior
+- Provide a professional, extensible codebase suitable for real project portfolios
 
-- OS learning and concept visualization
-- Algorithm comparison and experimentation
-- Demo-ready academic and interview portfolio use
+## 2. Problem-Solving Approach
 
-## 2. Problem Statement
+Common challenge:
+- OS concepts are usually taught theoretically, with low visual intuition.
 
-Traditional OS learning is often theory-heavy. Learners rarely see:
+Approach used in ProcessOS:
+- Isolate algorithms into pure computation modules.
+- Route all user actions through a controlled state layer.
+- Render outputs with reusable visualization components.
+- Validate behavior with automated tests and build checks.
 
-- Live CPU scheduling order
-- Real-time process state transitions
-- Memory fragmentation behavior
-- Page replacement impact
-- Deadlock formation and detection
+```mermaid
+flowchart TD
+  P[Theory-heavy learning pain] --> D[Need interactive explanation]
+  D --> A[Algorithm engine abstraction]
+  A --> S[Shared typed state]
+  S --> V[Visual simulation and metrics]
+  V --> L[Improved understanding and validation]
+```
 
-ProcessOS addresses this through a live simulation architecture.
-
-## 3. System Overview
+## 3. System Architecture and Design
 
 ```mermaid
 flowchart TB
-  subgraph Core
-    ENG[Simulation Engine]
-    ALG[Algorithm Modules]
-    SH[Shared State Layer\nTypeScript]
+  subgraph Presentation
+    UI1[Pages]
+    UI2[Controls and Charts]
   end
 
-  subgraph Frontend
-    REACT[React Interactive Simulation]
-    ANG[React System Monitor Dashboard]
+  subgraph State
+    ST1[Simulation Context]
+    ST2[Hooks]
   end
 
-  ENG --> REACT
-  ENG --> ANG
-  REACT --> SH
-  ANG --> SH
-  SH --> ALG
+  subgraph Engine
+    EN1[Scheduling]
+    EN2[Memory]
+    EN3[Paging]
+    EN4[Deadlock]
+  end
+
+  subgraph Contracts
+    SH[shared/types]
+  end
+
+  UI1 --> ST1
+  UI2 --> ST1
+  ST1 --> EN1
+  ST1 --> EN2
+  ST1 --> EN3
+  ST1 --> EN4
+  SH --> UI1
+  SH --> ST1
+  SH --> EN1
+  SH --> EN2
+  SH --> EN3
+  SH --> EN4
 ```
 
-## 4. Module-Wise Documentation
-
-### 4.1 Process Manager
-
-Responsibilities:
-
-- Create process
-- Edit process parameters
-- Delete process
-- Manage state transitions
-
-Process attributes:
-
-- PID
-- Arrival Time
-- Burst Time
-- Priority
-- Memory Requirement
-- State
-
-State machine:
-
-```mermaid
-stateDiagram-v2
-  [*] --> NEW
-  NEW --> READY
-  READY --> RUNNING
-  RUNNING --> WAITING
-  WAITING --> READY
-  RUNNING --> TERMINATED
-```
-
-Data structures:
-
-- Queue
-- Priority Queue
-
-### 4.2 CPU Scheduling Engine
-
-Algorithms:
-
-- FCFS
-- SJF
-- Round Robin
-- Priority Scheduling
-
-Data structures:
-
-- Queue
-- Min Heap (SJF)
-- Circular Queue (RR)
-- Priority Queue
-
-Execution flow:
-
-```mermaid
-flowchart TD
-  A[User creates process set] --> B[Algorithm selected]
-  B --> C[Scheduler orders ready queue]
-  C --> D[CPU executes process]
-  D --> E[Reduce burst / update state]
-  E --> F{Done?}
-  F -->|No| C
-  F -->|Yes| G[Mark TERMINATED]
-```
-
-### 4.3 Gantt Chart Visualizer (React)
-
-Features:
-
-- Live timeline updates
-- Color-coded process blocks
-- Time quantum animation
-- Step-by-step playback
-
-Rendering options:
-
-- Canvas API
-- SVG
-
-Frame cadence target:
-
-- `500ms` update interval
-
-### 4.4 Memory Allocation Simulator
-
-Algorithms:
-
-- First Fit
-- Best Fit
-- Worst Fit
-
-Visual output example:
-
-```text
-|P1|P2|Free|P3|Free|P4|
-```
-
-Metrics:
-
-- Fragmentation
-- Allocation failure count
-- Used vs free memory
-
-### 4.5 Page Replacement Engine
-
-Algorithms:
-
-- FIFO
-- LRU
-- Optimal
-
-Metrics:
-
-- Total references
-- Page faults
-- Hit ratio
-- Fault ratio
-
-### 4.6 Deadlock Detection System
-
-Approach:
-
-- Banker's algorithm
-- Resource allocation graph cycle detection
-- DFS traversal
-
-Graph representation:
-
-```text
-Process -> Resource -> Process
-```
-
-Deadlock handling options:
-
-- Process termination
-- Resource preemption
-
-## 5. System Monitor Dashboard
-
-Dashboard modules:
-
-- Process table (PID, state, CPU%, memory)
-- CPU utilization graph (time vs utilization)
-- Algorithm comparison panel
-
-Comparison metrics:
-
-- Avg waiting time
-- Avg turnaround time
-- CPU utilization
-- Throughput
-
-## 6. End-to-End Workflow
-
-```mermaid
-flowchart TD
-  S1[Step 1: Create process set] --> S2[Step 2: Choose algorithm]
-  S2 --> S3[Step 3: Start simulation]
-  S3 --> S4[Step 4: Visualize CPU/memory/page/deadlock states]
-  S4 --> S5[Step 5: Monitor dashboard metrics]
-  S5 --> S6[Step 6: Compare algorithms + generate report]
-```
-
-## 7. Algorithms Summary
-
-| Feature | Algorithms |
-|---|---|
-| Scheduling | FCFS, SJF, Round Robin, Priority |
-| Memory | First Fit, Best Fit, Worst Fit |
-| Virtual Memory | FIFO, LRU, Optimal |
-| Deadlock | Banker's Algorithm |
-| Graph Detection | DFS Cycle Detection |
-
-## 8. Tech Stack
-
-Frontend:
-
-- React (simulation UI)
-- TypeScript
-- Canvas API
-- Chart.js / D3.js
-
-Backend (recommended):
-
-- Node.js
-- Express
-- REST API
-
-Implemented backend in this repository:
-
-- TypeScript Express API (`backend/`)
-- SQLite persistence (`backend/data/processos.db`)
-- Request validation via Zod
-
-## 9. Folder Organization (Reference Design)
-
-```text
-processOS/
-  frontend-react/
-    components/
-    gantt-chart/
-    scheduler/
-    memory-visualizer/
-    deadlock-graph/
-
-  core-engine/
-    scheduling/
-    memory/
-    deadlock/
-    paging/
-
-  shared/
-    models/
-    types/
-```
-
-## 10. SDLC Strategy
-
-1. Requirement phase: define simulation scope and module boundaries.
-2. Design phase: architecture, state contracts, UI flows.
-3. Implementation phase: algorithms, simulators, visual dashboards.
-4. Testing phase: unit + integration + scenario validation.
-5. Iteration phase: improve performance, UI polish, algorithm depth.
-
-## 11. Testing and Validation Plan
-
-Critical test scenarios:
-
-- Round Robin correctness under varying quantum.
-- Deadlock detection correctness for cyclic/non-cyclic graphs.
-- Page replacement fault/hit accuracy for reference strings.
-- Memory allocation correctness and fragmentation behavior.
-- Process lifecycle transition correctness.
-
-Validation checks:
-
-- Numeric input validation and bounds
-- Safe state updates
-- Failure message clarity
-- End-to-end flow stability
-
-## 12. Verification Checklist
-
-- All modules are integrated without flow breaks.
-- UI remains responsive across mobile/tablet/desktop.
-- No critical crashes during simulation scenarios.
-- Metrics and visual outputs stay consistent with algorithm outputs.
-- Test suite passes and build is successful.
-
-## 13. Advantages and Trade-Offs
-
-Advantages:
-
-- Strong OS and DSA demonstration
-- High visualization and UI value
-- Clear architecture and modularity
-- Interview and resume impact
-
-Trade-offs:
-
-- Increased complexity from multi-module full-stack integration
-- Strong need for strict shared-state contracts
-
-## 14. Advanced Features (Future Enhancements)
-
-- Multi-core CPU simulation
-- Cloud deployment (Vercel/Netlify)
-- Exportable PDF/CSV reports
-- Collaborative simulation rooms
-
-## 15. Setup and Execution
-
-```bash
-npm install
-npm run dev
-npm run test
-npm run build
-npm run backend:build
-```
-
-## 16. Configuration and Dependency Notes
-
-Current local configuration:
-
-- No runtime environment variables required.
-- React app and simulation engines run client-side.
-- Monitoring views are delivered within React dashboard modules.
-- Backend uses local SQLite file database by default.
-
-Dependency highlights:
-
-- React + TypeScript + Vite
-- Canvas API for timeline rendering
-- Chart.js + D3 for monitoring visualization
-- Express + SQLite for persistence-backed APIs
-
-## 17. Backend + Database Module Details
-
-Primary backend components:
-
-- `backend/src/server.ts`: API server bootstrap.
-- `backend/src/app.ts`: route registration and request handling.
-- `backend/src/db.ts`: SQLite initialization and schema creation.
-- `backend/src/engine/scheduler.ts`: server-side scheduling execution.
-
-Database schema:
-
-- `scenarios` table stores process set definitions.
-- `simulation_runs` table stores execution requests and computed outputs.
-
-API routes:
-
-- `GET /health`
-- `GET /api/scenarios`
-- `GET /api/scenarios/:id`
-- `POST /api/scenarios`
-- `POST /api/simulations/run`
-- `GET /api/simulations`
-
-## 18. End-to-End Validation Playbook
-
-1. Start React simulator and verify route navigation.
-2. Add/edit/remove processes and confirm state transitions.
-3. Run FCFS/SJF/RR/Priority and validate metrics rendering.
-4. Verify memory allocation behaviors (first/best/worst fit).
-5. Verify page replacement outputs (FIFO/LRU/Optimal).
-6. Validate deadlock checker (banker + graph cycle check).
-7. Start backend and verify `/health` + simulation endpoints.
-8. Run full verification pipeline.
+## 4. Key Modules and Responsibilities
+
+| Module | Responsibility | Integration Touchpoints |
+|---|---|---|
+| Process Input Layer | Captures workload definitions | Forms, context actions |
+| Scheduling Engine | Computes CPU execution order and metrics | Gantt and metrics panels |
+| Memory Engine | Simulates allocation policies | Memory visualizer |
+| Paging Engine | Simulates replacement policy outcomes | Paging visualizer and stats |
+| Deadlock Engine | Evaluates safety/cycle conditions | Deadlock detector views |
+| Dashboard Layer | Aggregates and compares outputs | Charts and health panels |
+
+## 5. Workflow Explanation
 
 ```mermaid
 flowchart LR
-  R[React UI Checks] --> A[Dashboard Checks]
-  A --> B[Backend API Checks]
-  B --> D[Database Persistence Checks]
-  D --> V[Full verify:all pipeline]
+  U[User Defines Inputs] --> C[Context Validates and Stores]
+  C --> E[Selected Engine Runs]
+  E --> R[Result and Metrics Model Produced]
+  R --> V[UI Visual Components Update]
+  V --> X[User Reviews and Compares]
 ```
 
-Acceptance criteria:
-
-- No crash on normal or edge-case user actions.
-- Deterministic algorithm outputs for fixed inputs.
-- UI feedback for all invalid inputs.
-- Successful test and build pipelines.
-- Backend API responses are valid and persisted records are retrievable.
-
-## Verification Coverage Chart
+## 6. Data Flow and Execution Flow
 
 ```mermaid
-pie title Validation Coverage
-  "Frontend Unit + Integration" : 40
-  "Backend API Tests" : 20
-  "React Build Verification" : 15
-  "Frontend Build Verification" : 15
-  "Database Persistence Checks" : 10
+sequenceDiagram
+  participant User
+  participant Page
+  participant Context
+  participant Engine
+  participant Dashboard
+
+  User->>Page: Enter parameters
+  Page->>Context: Submit simulation request
+  Context->>Engine: Execute algorithm with payload
+  Engine-->>Context: Return computed result
+  Context-->>Dashboard: Provide normalized metrics
+  Dashboard-->>User: Display comparative insights
 ```
 
-## 19. Production Readiness Criteria
+## 7. Tech Stack and Why It Was Chosen
 
-- Stable modular architecture with clear ownership per layer.
-- Verified CI-ready commands for test and build.
-- Documentation completeness across onboarding, architecture, and operations.
-- Backend/database integration implemented and verified.
+| Technology | Purpose | Selection Reason |
+|---|---|---|
+| React | UI composition | Flexible and component-driven |
+| TypeScript | Reliability | Static type guarantees across modules |
+| Vite | Build and dev speed | Fast feedback loop and optimized bundling |
+| Tailwind + Radix + shadcn | UI consistency | Rapid, accessible, reusable primitives |
+| Chart.js + D3 | Visualization | Reliable charting with transformation support |
+| Vitest + Testing Library | Testing | Modern and lightweight for React TS projects |
+| ESLint | Static quality | Standardized code quality enforcement |
 
-## 20. Resume-Ready Project Summary
+## 8. Code Structure and Organization
 
-**ProcessOS - Interactive Operating System Simulator**
+```text
+src/
+  components/
+    AlgorithmComparison.tsx
+    AnimatedGantt.tsx
+    MemoryVisualizer.tsx
+    PageReplacementVisualizer.tsx
+    DeadlockDetector.tsx
+    SystemMonitorPanel.tsx
+  context/
+    SimulationContext.tsx
+  engine/
+    scheduler.ts
+    memory.ts
+    paging.ts
+    deadlock.ts
+  pages/modules/
+    HomePage.tsx
+    SchedulingPage.tsx
+    MemoryPage.tsx
+    PagingPage.tsx
+    DeadlockPage.tsx
+    DashboardPage.tsx
+  test/
+    scheduler.test.ts
+    memory.test.ts
+    process-form.test.tsx
+shared/types/
+  simulation.models.ts
+```
 
-Tech Stack: React, TypeScript, Canvas API
+## 9. Crucial Components and Integration Details
 
-- Built an interactive OS simulator for CPU scheduling, memory allocation, page replacement, and deadlock analysis.
-- Implemented FCFS, SJF, Round Robin, and Priority scheduling with queue-based data structures.
-- Developed animated timeline visualizations for process execution behavior.
-- Designed system monitoring dashboards for CPU/memory metrics and algorithm comparison.
+- `SimulationContext` is the orchestration core between UI and engines.
+- Engine modules are pure TypeScript and independently testable.
+- Visual components read normalized state and avoid owning business logic.
+- Route-based module separation keeps features decoupled and maintainable.
 
-## 21. Final Notes
+## 10. Advantages, Benefits, Pros, and Cons
 
-This documentation is structured to present ProcessOS as a complete, architecture-first system with clear module boundaries, execution flow, and extension paths for production and hackathon-ready deployment.
+Pros:
+- High educational clarity through visual execution
+- Strong architecture boundaries and code readability
+- Deterministic algorithm behavior with tests
+
+Benefits:
+- Good for interview demos and academic presentations
+- Easy to extend with new algorithms
+- Fast local development and verification cycles
+
+Cons:
+- Frontend-only scope currently lacks persistence
+- Visualization complexity increases UI maintenance effort
+
+## 11. Setup and Execution Instructions
+
+### Prerequisites
+- Node.js `>=18`
+- npm `>=9`
+
+### Installation
+
+```bash
+npm install
+```
+
+### Run Locally
+
+```bash
+npm run dev
+```
+
+### Validate Project
+
+```bash
+npm run test
+npm run lint
+npm run build
+npm run verify:all
+```
+
+## 12. Validation and Testing Strategy
+
+Automated validation:
+- Unit tests for algorithm engines
+- Component-level UI behavior tests
+- Lint and build gate checks
+
+Manual validation:
+1. Test all module routes.
+2. Run each scheduling algorithm on the same workload.
+3. Validate memory and paging edge cases.
+4. Validate deadlock safe and unsafe scenarios.
+5. Confirm responsiveness across mobile and desktop viewports.
+
+## 13. Verification Workflow Diagram
+
+```mermaid
+flowchart TD
+  A[Install] --> B[Test]
+  B --> C[Lint]
+  C --> D[Build]
+  D --> E[Manual Scenario Validation]
+  E --> F[Release Decision]
+```
+
+## 14. Risk and Mitigation Summary
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Algorithm/UI mismatch | Incorrect visual interpretation | Shared typed models + test assertions |
+| Regression after feature updates | Broken user flows | `verify:all` pipeline in development cycle |
+| Performance drop with rich visuals | Reduced UX quality | Route-level lazy loading and modular charts |
+
+## 15. Current Scope and Extension Plan
+
+Current implemented scope:
+- Frontend simulator with complete algorithm modules and visuals
+
+Extension roadmap:
+- Backend API for scenario persistence
+- Database-backed simulation history
+- Shared reports and collaboration flows
