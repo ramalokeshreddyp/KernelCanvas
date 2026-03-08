@@ -51,4 +51,34 @@ describe('scheduler engine', () => {
     expect(result.ganttChart[0].startTime).toBe(0);
     expect(result.ganttChart[0].endTime).toBe(4);
   });
+
+  it('applies Round Robin time slicing in FIFO ready-queue order', () => {
+    const processes = [
+      makeProcess({ pid: 1, arrivalTime: 0, burstTime: 5 }),
+      makeProcess({ pid: 2, arrivalTime: 0, burstTime: 3 }),
+    ];
+
+    const result = runScheduler('RR', processes, 2);
+    const executionOrder = result.ganttChart.filter(block => block.pid !== -1).map(block => block.pid);
+
+    expect(executionOrder).toEqual([1, 2, 1, 2, 1]);
+    expect(result.cpuUtilization).toBe(100);
+  });
+
+  it('preempts lower-priority process when higher-priority process arrives', () => {
+    const processes = [
+      makeProcess({ pid: 1, arrivalTime: 0, burstTime: 4, priority: 3 }),
+      makeProcess({ pid: 2, arrivalTime: 1, burstTime: 2, priority: 1 }),
+    ];
+
+    const result = runScheduler('PRIORITY', processes);
+    const executionOrder = result.ganttChart.filter(block => block.pid !== -1).map(block => block.pid);
+
+    expect(executionOrder).toEqual([1, 2, 1]);
+
+    const highPriority = result.completedProcesses.find(p => p.pid === 2);
+    const lowPriority = result.completedProcesses.find(p => p.pid === 1);
+
+    expect(highPriority?.completionTime).toBeLessThan(lowPriority?.completionTime ?? Infinity);
+  });
 });
