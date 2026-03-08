@@ -198,6 +198,7 @@ Current implementation:
 - Algorithm engines
 - Shared types
 - Automated tests and build pipeline
+- Small integrated Angular micro-widget embedded on Home page (`/angular-micro/index.html`)
 
 Not currently implemented:
 - Backend API server

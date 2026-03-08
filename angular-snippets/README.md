@@ -22,5 +22,6 @@ bootstrapApplication(SchedulerDashboardComponent);
 
 - These snippets are not part of the React app runtime.
 - They are provided as reusable Angular examples and can be copied into a real Angular workspace.
+- A tiny live Angular micro-widget is integrated via iframe at `/angular-micro/index.html` and shown on the Home page.
 
 This repository's current build pipeline does not compile this folder.
