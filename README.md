@@ -112,11 +112,11 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-  H[/] --> S[/scheduling]
-  H --> M[/memory]
-  H --> P[/paging]
-  H --> D[/deadlock]
-  H --> B[/dashboard]
+  H["/"] --> S["/scheduling"]
+  H --> M["/memory"]
+  H --> P["/paging"]
+  H --> D["/deadlock"]
+  H --> B["/dashboard"]
 ```
 
 ## Local Setup and Installation
