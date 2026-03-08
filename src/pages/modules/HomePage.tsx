@@ -88,31 +88,6 @@ export default function HomePage() {
         ))}
       </div>
 
-      <PanelCard>
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <h2 className="text-base font-mono font-semibold text-foreground">Angular Micro Widget</h2>
-            <p className="text-sm text-muted-foreground">Small embedded Angular scheduler preview (isolated micro role).</p>
-          </div>
-          <a
-            href="/angular-micro/index.html"
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-md border border-border bg-secondary px-3 py-1 text-xs font-mono font-semibold text-foreground hover:bg-muted"
-          >
-            Open Full Widget
-          </a>
-        </div>
-
-        <div className="overflow-hidden rounded-lg border border-border bg-background">
-          <iframe
-            title="Angular micro scheduler"
-            src="/angular-micro/index.html"
-            className="h-52 w-full"
-            loading="lazy"
-          />
-        </div>
-      </PanelCard>
     </div>
   );
 }
