@@ -6,6 +6,63 @@
 
 @layer base {
   :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 210 45% 99%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 198 93% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 38% 94%;
+    --secondary-foreground: 222 47% 15%;
+
+    --muted: 210 32% 92%;
+    --muted-foreground: 218 16% 44%;
+
+    --accent: 148 62% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --success: 148 62% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 215 27% 84%;
+    --input: 215 27% 84%;
+    --ring: 198 93% 38%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 210 42% 96%;
+    --sidebar-foreground: 222 47% 15%;
+    --sidebar-primary: 198 93% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 32% 92%;
+    --sidebar-accent-foreground: 222 47% 15%;
+    --sidebar-border: 215 27% 84%;
+    --sidebar-ring: 198 93% 38%;
+
+    --font-sans: 'Space Grotesk', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+
+    --bg-radial-1: hsl(198 93% 38% / 0.12);
+    --bg-radial-2: hsl(148 62% 40% / 0.1);
+    --bg-grad-top: hsl(210 40% 98%);
+    --bg-grad-bottom: hsl(210 36% 95%);
+    --scanline: hsl(222 47% 11% / 0.03);
+    --atmosphere-streak: hsl(198 93% 38% / 0.08);
+  }
+
+  .dark {
     --background: 220 30% 6%;
     --foreground: 200 20% 90%;
 
@@ -40,8 +97,6 @@
     --input: 220 20% 16%;
     --ring: 187 100% 45%;
 
-    --radius: 0.5rem;
-
     --sidebar-background: 220 25% 8%;
     --sidebar-foreground: 200 20% 80%;
     --sidebar-primary: 187 100% 45%;
@@ -51,9 +106,12 @@
     --sidebar-border: 220 20% 16%;
     --sidebar-ring: 187 100% 45%;
 
-    --font-mono: 'JetBrains Mono', monospace;
-    --font-sans: 'Space Grotesk', sans-serif;
-    --font-mono: 'IBM Plex Mono', monospace;
+    --bg-radial-1: hsl(187 100% 45% / 0.12);
+    --bg-radial-2: hsl(120 100% 62% / 0.1);
+    --bg-grad-top: hsl(220 30% 6%);
+    --bg-grad-bottom: hsl(220 24% 7%);
+    --scanline: hsl(220 30% 6% / 0.03);
+    --atmosphere-streak: hsl(220 30% 6% / 0.2);
   }
 }
 
@@ -65,10 +123,11 @@
   body {
     @apply bg-background text-foreground font-sans;
     background-image:
-      radial-gradient(circle at 20% 10%, hsl(187 100% 45% / 0.12), transparent 42%),
-      radial-gradient(circle at 80% 20%, hsl(120 100% 62% / 0.1), transparent 36%),
-      linear-gradient(180deg, hsl(220 30% 6%), hsl(220 24% 7%));
+      radial-gradient(circle at 20% 10%, var(--bg-radial-1), transparent 42%),
+      radial-gradient(circle at 80% 20%, var(--bg-radial-2), transparent 36%),
+      linear-gradient(180deg, var(--bg-grad-top), var(--bg-grad-bottom));
     background-attachment: fixed;
+    transition: background-color 250ms ease, color 250ms ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -95,8 +154,8 @@
     0deg,
     transparent,
     transparent 2px,
-    hsl(220 30% 6% / 0.03) 2px,
-    hsl(220 30% 6% / 0.03) 4px
+    var(--scanline) 2px,
+    var(--scanline) 4px
   );
   pointer-events: none;
 }
@@ -166,9 +225,9 @@
   pointer-events: none;
   background-image: linear-gradient(
     to right,
-    hsl(220 30% 6% / 0) 0,
-    hsl(220 30% 6% / 0.2) 50%,
-    hsl(220 30% 6% / 0) 100%
+    transparent 0,
+    var(--atmosphere-streak) 50%,
+    transparent 100%
   );
   mix-blend-mode: screen;
 }

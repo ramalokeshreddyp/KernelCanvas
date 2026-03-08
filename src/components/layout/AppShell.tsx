@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Activity, Cpu, HardDrive, Home, Layers, ShieldAlert, Terminal } from 'lucide-react';
+import { Activity, Cpu, HardDrive, Home, Layers, Moon, ShieldAlert, Sun, Terminal } from 'lucide-react';
 import { useSimulationContext } from '@/context/SimulationContext';
+import { useTheme } from 'next-themes';
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home },
@@ -21,6 +23,14 @@ function StatChip({ label, value, accent }: { label: string; value: string; acce
 
 export function AppShell() {
   const sim = useSimulationContext();
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = resolvedTheme !== 'light';
 
   return (
     <div className="min-h-screen bg-background atmospheric-bg">
@@ -42,6 +52,17 @@ export function AppShell() {
               <StatChip label="ALGO" value={sim.algorithm} accent />
               <StatChip label="MEM" value={sim.memoryAlgorithm.replace('_', ' ')} />
               <StatChip label="CPU" value={sim.result ? `${sim.result.cpuUtilization.toFixed(0)}%` : '--'} accent />
+              {mounted && (
+                <button
+                  type="button"
+                  onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-[11px] font-mono font-semibold text-foreground transition-colors hover:bg-muted"
+                  aria-label="Toggle theme"
+                >
+                  {isDark ? <Sun size={13} className="text-warning" /> : <Moon size={13} className="text-primary" />}
+                  {isDark ? 'LIGHT MODE' : 'DARK MODE'}
+                </button>
+              )}
             </div>
           </div>
 
